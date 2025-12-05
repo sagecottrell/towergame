@@ -4,7 +4,7 @@ import { cost_to_rezone_floor, worker_pool_total } from '../logicFunctions.ts';
 import { Default as floor_default, type Floor, type FloorId } from '../types/Floor.ts';
 import { FLOOR_DEFS } from '../types/FloorDefinition.ts';
 import { as_int_or_default, type uint } from '../types/RestrictedTypes.ts';
-import {ROOM_DEFS} from '../types/RoomDefinition.ts';
+import { ROOM_DEFS } from '../types/RoomDefinition.ts';
 import type { SaveFile } from '../types/SaveFile.ts';
 import { TRANSPORT_DEFS } from '../types/TransportationDefinition.ts';
 import { Default as room_default, type Room, type RoomId, type RoomWithState } from '../types/Room.ts';
@@ -16,6 +16,7 @@ import { worker_spawn } from '../logic/workerSpawn.ts';
 import { apply_workers } from '../logic/applyWorkers.ts';
 import { entries, keys } from '../betterObjectFunctions.ts';
 import { is } from '../is.ts';
+import { rng_action } from '../logic/rng_action.ts';
 
 type ActionMap = {
     [p in SaveFileActions['action']]: (
@@ -39,13 +40,15 @@ const ActionMaps: ActionMap = {
     // ================================================================================================================
     // ================================================================================================================
     'increase-tier'(save, action) {
-        const {building_id, tier} = action;
+        const { building_id, tier } = action;
         const building = save.buildings[building_id];
         building.rating = tier;
 
         // add items to the save file "seen" props
-        save.rooms_seen = [...new Set(keys(ROOM_DEFS).filter(kind => ROOM_DEFS[kind].tier <= tier))];
-        save.floors_seen = [...new Set(keys(FLOOR_DEFS.buildables).filter(kind => FLOOR_DEFS.buildables[kind].tier <= tier))];
+        save.rooms_seen = [...new Set(keys(ROOM_DEFS).filter((kind) => ROOM_DEFS[kind].tier <= tier))];
+        save.floors_seen = [
+            ...new Set(keys(FLOOR_DEFS.buildables).filter((kind) => FLOOR_DEFS.buildables[kind].tier <= tier)),
+        ];
     },
     // ================================================================================================================
     // ================================================================================================================
@@ -64,6 +67,7 @@ const ActionMaps: ActionMap = {
         if (!try_mapping_subtract(building.wallet, cost, building.wallet)) return;
         building.floors.splice(i, 0, floor);
         building.top_floor = building.floors[0].height;
+        rng_action(building, 'add-floor');
     },
     // ================================================================================================================
     // ================================================================================================================
@@ -100,6 +104,7 @@ const ActionMaps: ActionMap = {
                 dispatch({ action: 'room-tick', building_id, room_id: filled.id });
             }
         }
+        rng_action(building, 'buy-room');
     },
     // ================================================================================================================
     // ================================================================================================================

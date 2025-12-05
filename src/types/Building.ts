@@ -7,6 +7,7 @@ import type { Room, RoomId } from './Room.ts';
 import type { SMap } from './SMap.ts';
 import type { TowerWorker } from './TowerWorker.ts';
 import type { Transportation } from './Transportation.ts';
+import { random } from 'lodash';
 
 export type BuildingId = uint & { readonly _b_type: unique symbol };
 
@@ -22,6 +23,9 @@ export interface Building {
     top_floor: int;
     max_width: uint;
     transports: SMap<Transportation>;
+
+    seed: number;
+    rng_state: number;
 
     rating: uint;
     new_things_acked: SMap<string>;
@@ -49,6 +53,7 @@ export interface Building {
 }
 
 export function Default(items?: Partial<Building>): Building {
+    const seed = random(1000);
     return {
         top_floor: 0 as int,
         floors: [],
@@ -69,6 +74,8 @@ export function Default(items?: Partial<Building>): Building {
         rooms: {},
         room_id_counter: 0,
         worker_id_counter: 0,
+        seed,
+        rng_state: seed,
         ...items,
     };
 }
