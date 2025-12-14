@@ -18,6 +18,9 @@ export interface FloorDefinition {
     cost_to_build: ResourceMap<uint>;
     tier: uint;
 
+    bookend_left: string;
+    bookend_right: string;
+
     readme: string;
 
     rooms: RoomKind[];
@@ -44,16 +47,16 @@ export const FLOOR_DEFS: FloorDefs = {
 function def_from_raw(id: string, item: FloorDefRaw): FloorDefinition {
     return {
         d: 'floor',
-        // @ts-expect-error
-        id,
+        id: id as FloorKind,
         tier: as_uint_or_default(item.tier ?? 0),
         background: item.background,
         name: item.name,
         cost_to_build: Object.fromEntries(
             Object.entries(item.cost_to_build).map(([key, value]) => [key, as_uint_or_default(value)]),
         ),
-        // @ts-expect-error
-        rooms: item.rooms ?? [],
+        rooms: (item.rooms as RoomKind[]) ?? [],
         readme: item.readme ?? '',
+        bookend_left: item.bookend_left ?? '',
+        bookend_right: item.bookend_right ?? '',
     };
 }

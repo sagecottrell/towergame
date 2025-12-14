@@ -2,15 +2,15 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { RoomCategory } from '../content/room-defs.ts';
 import { BuildingContext } from '../context/BuildingContext.ts';
 import { useConstructionContext } from '../hooks/useConstructionContext.ts';
+import { mapping_sufficient } from '../logic/mappingComparison.ts';
 import { FLOOR_DEFS, type FloorKind } from '../types/FloorDefinition.ts';
 import type { ResourceMap } from '../types/ResourceDefinition.ts';
 import type { uint } from '../types/RestrictedTypes.ts';
 import { ROOM_DEFS, type RoomKind } from '../types/RoomDefinition.ts';
 import { TRANSPORT_DEFS, type TransportationKind } from '../types/TransportationDefinition.ts';
+import { EncyclopediaModal } from './encyclopedia/Encyclopedia.tsx';
 import { PinSide } from './PinSide.tsx';
 import { ResourceMapDisplay } from './ResourceMapDisplay.tsx';
-import { mapping_sufficient } from '../logic/mappingComparison.ts';
-import { EncyclopediaModal } from './encyclopedia/Encyclopedia.tsx';
 
 const build_menu_style = {
     position: 'relative',
@@ -119,7 +119,7 @@ export function BuildMenu() {
                     gap: '2px',
                 }}
             >
-                Resources: <ResourceMapDisplay resources={building.wallet} />
+                Resources: <ResourceMapDisplay resources={building.wallet} show_all />
             </div>
             {construction && (
                 <div style={{ ...itemPadding, display: 'flex', gap: '5px' }}>
@@ -339,6 +339,8 @@ function BuildButton({ selected, cost, set }: { selected: boolean; cost: Resourc
                 display: 'flex',
                 alignItems: 'center',
                 gap: '5px',
+                borderRadius: 0,
+                padding: '5px',
             }}
             disabled={selected || !mapping_sufficient(building.wallet, cost)}
             onClick={set}

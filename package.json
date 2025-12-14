@@ -8,7 +8,8 @@
         "check": "biome check --write",
         "dev": "rsbuild dev --open",
         "format": "biome format . --write",
-        "preview": "rsbuild preview"
+        "preview": "rsbuild preview",
+        "images-watch": "py src/content/gen_images.py --watch"
     },
     "dependencies": {
         "@datastructures-js/priority-queue": "^6.3.4",

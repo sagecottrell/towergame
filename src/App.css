@@ -46,6 +46,16 @@ Utils
 
  */
 
+
+img.resource-img {
+    width: 1.5em;
+    height: 1.5em;
+    border-top: 1px navajowhite solid;
+    border-left: 1px navajowhite solid;
+    border-bottom: 1px black solid;
+    border-right: 1px black solid;
+}
+
 .no-pointer {
     pointer-events: none;
 }

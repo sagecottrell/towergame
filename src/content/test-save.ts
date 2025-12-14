@@ -13,7 +13,7 @@ export const TEST_SAVE: SaveFile = save({
             position: 50 as int,
             top_floor: 0 as int,
             max_height: 10 as uint,
-            wallet: { coin: 1000 } as ResourceMap<uint>,
+            wallet: { coin: 1000, bone: 10, fire: 1000 } as ResourceMap<uint>,
             new_things_acked: {},
             floors: [
                 floor({

@@ -49,6 +49,28 @@ export function FloorComponent({ floor }: Props) {
                 {floor.room_ids.map((room_id) => (
                     <RoomComponentMemo key={room_id} room={building.rooms[room_id]} />
                 ))}
+                {(floor_def.bookend_left || floor_def.bookend_right) && (
+                    <img
+                        src={floor_def.bookend_left || floor_def.bookend_right}
+                        alt={'left'}
+                        style={{
+                            ...bookend_styles(floor),
+                            left: hori(-floor.size_left),
+                            transform: !floor_def.bookend_left ? 'scaleX(-1)' : '',
+                        }}
+                    />
+                )}
+                {(floor_def.bookend_right || floor_def.bookend_left) && (
+                    <img
+                        src={floor_def.bookend_right || floor_def.bookend_left}
+                        alt={'right'}
+                        style={{
+                            ...bookend_styles(floor),
+                            right: hori(-floor.size_right),
+                            transform: !floor_def.bookend_right ? 'scaleX(-1)' : '',
+                        }}
+                    />
+                )}
             </div>
         </FloorContext>
     );
@@ -58,14 +80,14 @@ export const FloorComponentMemo = memo(FloorComponent);
 
 function Background({ floor }: { floor: Floor }) {
     const floor_def = floor.kind ? FLOOR_DEFS.buildables[floor.kind] : FLOOR_DEFS.empty;
-    return <div style={bg_styles(floor, floor_def.background)}></div>;
+    return <div style={bg_styles(floor, floor_def.background)} />;
 }
 
 /**
- * Roof for the floor below. Not for ourselves, just so we don't have to deal with layering display issues
+ * Roof for the floor below. Not for ourselves (except the top floor), just so we don't have to deal with layering display issues
  */
 function RoofOnBelow({ floor, below_floor }: { floor: Floor; below_floor: Floor }) {
-    if (floor.height < 1) return null;
+    if (floor.height < 0) return null;
     return (
         <div
             id={`floor-${below_floor.height}-roof`}
@@ -106,5 +128,12 @@ function bg_styles(floor: Floor, image: string): React.CSSProperties {
         zIndex: -1,
         position: 'absolute',
         transition: 'width 0.4s ease-in-out, left 0.4s ease-in-out',
+    };
+}
+
+function bookend_styles(floor: Floor): React.CSSProperties {
+    return {
+        position: 'absolute',
+        zIndex: floor.height,
     };
 }

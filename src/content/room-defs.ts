@@ -17,7 +17,7 @@ export const ROOM_DEFS_RAW = {
         display_name: 'Advertisement',
         sprite_active: images.rooms.BESTVIEWEDCOMP_GIF,
         sprite_empty: images.rooms.BESTVIEWEDCOMP_GIF,
-        cost_to_build: { coin: 10 },
+        cost_to_build: { bone: 10 },
         build_thumb: images.rooms.BESTVIEWEDCOMP_GIF,
         production: { coin: 5 },
         produce_to_wallet: true,

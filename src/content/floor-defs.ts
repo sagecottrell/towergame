@@ -11,12 +11,14 @@ export const FLOOR_DEFS_RAW = {
             background: images.floors.BASIC_FLOOR_BG_PNG,
             cost_to_build: { coin: 10 },
             rooms: ['hotel-basic-small', 'ad-1', 'faceless-spawn'],
+            bookend_left: images.floors.BOOKEND_1_LEFT_PNG,
         },
         'express-lobby': {
             name: 'Express Lobby',
             background: images.floors.BASIC_FLOOR_BG_PNG,
             cost_to_build: { coin: 20 },
             rooms: [],
+            bookend_left: images.floors.BOOKEND_1_LEFT_PNG,
         },
     },
     empty: {
@@ -24,6 +26,7 @@ export const FLOOR_DEFS_RAW = {
         background: images.floors.EMPTY_FLOOR_BG_PNG,
         cost_to_build: { coin: 10 },
         rooms: [],
+        bookend_left: images.floors.BOOKEND_1_LEFT_PNG,
     },
     roofs: {
         basic: {
@@ -55,6 +58,9 @@ export interface FloorDefRaw {
     tier?: number;
     rooms?: RoomIds[];
     readme?: string;
+
+    bookend_left?: string;
+    bookend_right?: string;
 }
 export interface FloorDefsRaw {
     roofs: SMap<FloorDefRaw>;

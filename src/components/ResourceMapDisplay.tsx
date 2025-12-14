@@ -4,29 +4,34 @@ import type { uint } from '../types/RestrictedTypes.ts';
 interface Props {
     resources: ResourceMap<uint>;
     show_counts?: boolean;
+    show_zeroes?: boolean;
+    show_all?: boolean;
     style?: React.CSSProperties;
 }
 
-const img_size: React.CSSProperties = {
-    width: '1em',
-    height: '1em',
-};
 const flex: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     gap: '3px',
 };
 
-export function ResourceMapDisplay({ resources, style, show_counts = true }: Props) {
+export function ResourceMapDisplay({
+    resources,
+    style,
+    show_counts = true,
+    show_zeroes = false,
+    show_all = false,
+}: Props) {
     return (
         <>
             {Object.values(RESOURCE_DEFS).map((def) => {
                 const r = resources[def.kind];
-                if (!r) return null;
+                if (!show_all && (r === undefined || r === null)) return null;
+                if (!show_all && r === 0 && !show_zeroes) return null;
                 return (
                     <span key={def.kind} style={{ ...flex, ...style }}>
-                        <img style={img_size} src={def.sprite} alt={def.kind} />
-                        <span>{show_counts ? r : null}</span>
+                        <img title={def.kind} className={'resource-img'} src={def.sprite} alt={def.kind} />
+                        <span>{show_counts ? (r ?? 0) : null}</span>
                     </span>
                 );
             })}

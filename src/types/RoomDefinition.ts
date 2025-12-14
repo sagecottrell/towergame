@@ -93,8 +93,7 @@ export const ROOM_DEFS: {
 function def_from_raw(id: string, raw: RoomDefRaw): RoomDefinition {
     return {
         d: 'room',
-        // @ts-expect-error
-        id,
+        id: id as RoomKind,
         category: raw.category ?? RoomCategory.Room,
         cost_to_build: process_cost_to_build(raw),
         min_width: as_uint_or_default(raw.min_width),

@@ -1,7 +1,7 @@
 import isEmpty from 'lodash/isEmpty';
 import { ROOM_DEFS, type RoomDefinition, type RoomKind } from '../../types/RoomDefinition.ts';
 import { ResourceMapDisplay } from '../ResourceMapDisplay.tsx';
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { as_uint_or_default } from '../../types/RestrictedTypes.ts';
 
 interface Props {
@@ -15,12 +15,15 @@ export function EncyclopediaRoom({ room_kind }: Props) {
         // some null props are OK, but it has to be explicit here.
         // some props may be combined into one display; this is also fine.
         sprite_active: null,
-        display_name: <span style={{fontSize: 'larger'}}>{def.display_name}</span>,
+        display_name: <span style={{ fontSize: 'larger' }}>{def.display_name}</span>,
         readme: def.readme,
         cost_to_build: !isEmpty(def.cost_to_build(def.min_width, def.min_height)) && <CostCalculator def={def} />,
         production: !isEmpty(def.production) && (
             <div>
-                Produce {def.max_productions_per_day && <>up to {def.max_productions_per_day} time{def.max_productions_per_day > 1 ? 's' : ''} per day</>}:
+                {def.max_productions_per_day
+                    ? `Produce up to ${def.max_productions_per_day} time${def.max_productions_per_day > 1 ? 's' : ''} per day`
+                    : 'Produce'}
+                :
                 <ResourceMapDisplay resources={def.production} />
             </div>
         ),
@@ -61,6 +64,10 @@ export function EncyclopediaRoom({ room_kind }: Props) {
 function CostCalculator({ def }: { def: RoomDefinition }) {
     const [w, setw] = useState(def.min_width);
     const [h, seth] = useState(def.min_height);
+    useLayoutEffect(() => {
+        setw(def.min_width);
+        seth(def.min_height);
+    }, [def]);
     return (
         <div>
             Cost:
