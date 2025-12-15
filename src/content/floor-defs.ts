@@ -10,7 +10,7 @@ export const FLOOR_DEFS_RAW = {
             name: 'Basic',
             background: images.floors.BASIC_FLOOR_BG_PNG,
             cost_to_build: { coin: 10 },
-            rooms: ['hotel-basic-small', 'ad-1', 'faceless-spawn'],
+            rooms: ['hotel-basic-small', 'ad-1', 'faceless-spawn', 'fire-room1'],
             bookend_left: images.floors.BOOKEND_1_LEFT_PNG,
         },
         'express-lobby': {

@@ -9,6 +9,7 @@ export type ResourceKind = string & { readonly __type: unique symbol };
 export interface ResourceDefinition {
     kind: ResourceKind;
     sprite: string;
+    display_name?: string;
 }
 
 export const RESOURCE_DEFS: {
@@ -21,5 +22,6 @@ function def_from_raw(id: string, raw: ResourceDefRaw): ResourceDefinition {
     return {
         kind: id as ResourceKind,
         sprite: raw.sprite,
+        display_name: raw.display_name,
     };
 }

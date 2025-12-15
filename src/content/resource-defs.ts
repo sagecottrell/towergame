@@ -30,6 +30,7 @@ export const RESOURCE_DEFS_RAW = {
 
 export interface ResourceDefRaw {
     sprite: string;
+    display_name?: string;
 }
 
 export type ResourceIds = keyof typeof RESOURCE_DEFS_RAW;

@@ -5,6 +5,7 @@ export type TowerWorkerKind = string & { readonly __type: unique symbol };
 
 export interface TowerWorkerDefinition {
     kind: TowerWorkerKind;
+    display_name?: string;
     sprite_moving: string;
     sprite_stationary: string;
     portrait: string;
@@ -27,6 +28,7 @@ export const TOWER_WORKER_DEFS: {
 function def_from_raw(id: string, raw: TowerWorkerDefsRaw): TowerWorkerDefinition {
     return {
         kind: id as TowerWorkerKind,
+        display_name: raw.display_name,
         sprite_moving: raw.sprite_moving,
         sprite_stationary: raw.sprite_stationary ?? raw.sprite_moving,
         portrait: raw.portrait ?? raw.sprite_stationary ?? raw.sprite_moving,

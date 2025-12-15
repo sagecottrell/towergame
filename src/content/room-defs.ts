@@ -45,6 +45,17 @@ export const ROOM_DEFS_RAW = {
         workers_produced: { faceless: 10 },
         readme: 'Provides some workers',
     },
+    'fire-room1': {
+        min_width: 2,
+        display_name: 'Fire Room',
+        sprite_empty: images.rooms.FIRE_ROOM1_GIF,
+        sprite_active: images.rooms.FIRE_ROOM1_GIF,
+        cost_to_build: {coin: 150},
+        build_thumb: images.rooms.FIRE_ROOM1_PNG,
+        workers_required: {faceless: 1},
+        production: {fire: 1},
+        readme: 'Produces some FIRE',
+    }
 } as const satisfies SMap<RoomDefRaw>;
 
 export interface RoomDefRaw {

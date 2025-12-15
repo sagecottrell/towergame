@@ -1,4 +1,4 @@
-import { RESOURCE_DEFS, type ResourceMap } from '../types/ResourceDefinition.ts';
+import { RESOURCE_DEFS, type ResourceDefinition, type ResourceMap } from '../types/ResourceDefinition.ts';
 import type { uint } from '../types/RestrictedTypes.ts';
 
 interface Props {
@@ -6,6 +6,7 @@ interface Props {
     show_counts?: boolean;
     show_zeroes?: boolean;
     show_all?: boolean;
+    show_name?: boolean;
     style?: React.CSSProperties;
 }
 
@@ -21,6 +22,7 @@ export function ResourceMapDisplay({
     show_counts = true,
     show_zeroes = false,
     show_all = false,
+    show_name = false,
 }: Props) {
     return (
         <>
@@ -31,10 +33,21 @@ export function ResourceMapDisplay({
                 return (
                     <span key={def.kind} style={{ ...flex, ...style }}>
                         <img title={def.kind} className={'resource-img'} src={def.sprite} alt={def.kind} />
-                        <span>{show_counts ? (r ?? 0) : null}</span>
+                        <span>
+                            {show_counts ? (r ?? 0) : null} {show_name ? calc_name(def, r ?? 0) : null}
+                        </span>
                     </span>
                 );
             })}
         </>
     );
+}
+
+function calc_name(def: ResourceDefinition, amount: uint) {
+    let name = def.display_name;
+    if (!name) name = def.kind;
+    const cap = name[0].toUpperCase() + def.kind.slice(1);
+    if (amount <= 1) return cap;
+    if (cap.endsWith('s')) return cap;
+    return `${cap}s`;
 }

@@ -206,7 +206,7 @@ function get_room_items(update_func: (p: NonNullable<Props['initial']>) => void)
             ([kind, def]) =>
                 [
                     kind,
-                    <Item key={0} name={def.display_name} sprite={def.sprite_active} />,
+                    <Item key={0} name={def.display_name} sprite={def.build_thumb ?? def.sprite_empty} />,
                     () => update_func({ room: kind }),
                 ] as const,
         );

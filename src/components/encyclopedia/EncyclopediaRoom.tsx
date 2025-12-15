@@ -14,7 +14,6 @@ export function EncyclopediaRoom({ room_kind }: Props) {
         // this object helps us make sure that we don't add a property to the room definition then forget to add it here.
         // some null props are OK, but it has to be explicit here.
         // some props may be combined into one display; this is also fine.
-        sprite_active: null,
         display_name: <span style={{ fontSize: 'larger' }}>{def.display_name}</span>,
         readme: def.readme,
         cost_to_build: !isEmpty(def.cost_to_build(def.min_width, def.min_height)) && <CostCalculator def={def} />,
@@ -24,7 +23,7 @@ export function EncyclopediaRoom({ room_kind }: Props) {
                     ? `Produce up to ${def.max_productions_per_day} time${def.max_productions_per_day > 1 ? 's' : ''} per day`
                     : 'Produce'}
                 :
-                <ResourceMapDisplay resources={def.production} />
+                <ResourceMapDisplay resources={def.production} show_name />
             </div>
         ),
         max_productions_per_day: null,
@@ -36,12 +35,13 @@ export function EncyclopediaRoom({ room_kind }: Props) {
         min_height: null,
         min_width: null,
         width_multiples_of: null,
-        sprite_empty: null,
+        sprite_active: def.sprite_active && def.sprite_empty !== def.sprite_active && <>Active: <br/><img src={def.sprite_active} alt={'active'} /> </>,
+        sprite_empty: def.sprite_empty && <>Default Sprite:<br/><img src={def.sprite_empty} alt={'empty'} /> </>,
         max_width: null,
         overlay: null,
         build_thumb: null,
-        sprite_empty_night: null,
-        sprite_active_night: null,
+        sprite_empty_night: def.sprite_empty_night && <>Night Empty:<br/><img src={def.sprite_empty_night} alt={'empty-night'} /> </>,
+        sprite_active_night: def.sprite_active_night && <>Night Active:<br/><img src={def.sprite_active_night} alt={'active-night'} /> </>,
         max_height: null,
         category: null,
         d: null,
@@ -100,7 +100,7 @@ function CostCalculator({ def }: { def: RoomDefinition }) {
                     />
                 </label>
             )}
-            <ResourceMapDisplay resources={def.cost_to_build(w, h)} />
+            <ResourceMapDisplay resources={def.cost_to_build(w, h)} show_name />
         </div>
     );
 }

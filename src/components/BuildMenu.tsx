@@ -9,7 +9,7 @@ import type { uint } from '../types/RestrictedTypes.ts';
 import { ROOM_DEFS, type RoomKind } from '../types/RoomDefinition.ts';
 import { TRANSPORT_DEFS, type TransportationKind } from '../types/TransportationDefinition.ts';
 import { EncyclopediaModal } from './encyclopedia/Encyclopedia.tsx';
-import { PinSide } from './PinSide.tsx';
+import { usePinSide } from './PinSide.tsx';
 import { ResourceMapDisplay } from './ResourceMapDisplay.tsx';
 
 const build_menu_style = {
@@ -18,7 +18,7 @@ const build_menu_style = {
     flexDirection: 'column',
     alignContent: 'space-around',
     overflowY: 'scroll',
-    height: '50vh',
+    height: '100vh',
     paddingBottom: '10px',
     gap: '10px',
     background: 'white',
@@ -45,8 +45,7 @@ export function BuildMenu() {
     /// ====================================================================================================
     const [current_menu, set_current_menu] = useState<Menu>(Menu.Rooms);
 
-    const [position, set_position] = useState<'left' | 'right'>('left');
-    const [pinned, set_pinned] = useState(true);
+    const {pinned, position, elem: pin_elem} = usePinSide(true, null);
     const [mouse_in, set_mouse_in] = useState(false);
     const [rect, set_rect] = useState<DOMRect | null>(null);
     const ref = useRef<HTMLDivElement>(null);
@@ -74,7 +73,6 @@ export function BuildMenu() {
     /// ====================================================================================================
 
     const select = { set_menu, current_menu };
-    const pin_side = { pinned, set_pinned, set_position, position };
     let current_display = null;
     switch (construction?.type) {
         case 'room':
@@ -110,7 +108,7 @@ export function BuildMenu() {
             }}
             className={!mouse_in && !pinned ? 'hide-content' : ''}
         >
-            <PinSide {...pin_side} />
+            {pin_elem}
             <div
                 style={{
                     ...itemPadding,
@@ -119,7 +117,7 @@ export function BuildMenu() {
                     gap: '2px',
                 }}
             >
-                Resources: <ResourceMapDisplay resources={building.wallet} show_all />
+                Resources: <ResourceMapDisplay resources={building.wallet} show_zeroes show_name />
             </div>
             {construction && (
                 <div style={{ ...itemPadding, display: 'flex', gap: '5px' }}>
@@ -177,7 +175,7 @@ function RoomSelector() {
                             </span>
                             <img
                                 className={'pointer'}
-                                src={def.sprite_empty}
+                                src={def.build_thumb ?? def.sprite_empty}
                                 alt={def.sprite_empty}
                                 onClick={() => set_show(def.id)}
                             />
@@ -289,7 +287,7 @@ function TransportationSelector() {
 
 function side_styles(
     mouse_in: boolean,
-    position: string,
+    position: string | null,
     pinned: boolean,
     rect: DOMRect | null,
     visible: number,
@@ -297,10 +295,8 @@ function side_styles(
     return {
         right:
             position === 'right' ? (mouse_in ? '0px' : `-${pinned ? 0 : (rect?.width ?? 0) - visible}px`) : undefined,
-        left: position === 'left' ? (mouse_in ? '0px' : `-${pinned ? 0 : (rect?.width ?? 0) - visible}px`) : undefined,
+        left: position !== 'left' ? (mouse_in ? '0px' : `-${pinned ? 0 : (rect?.width ?? 0) - visible}px`) : undefined,
         transition: `left 0.25s ease-out, right 0.25s ease-out`,
-        borderBottomRightRadius: position === 'right' ? '' : '5px',
-        borderBottomLeftRadius: position === 'left' ? '' : '5px',
     };
 }
 
