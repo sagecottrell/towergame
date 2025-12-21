@@ -9,6 +9,8 @@ import type { FloorKind } from './FloorDefinition.ts';
  */
 export interface SaveFile {
     buildings: Building[];
+    current_building: number | null;
+
     wallet: ResourceMap<uint>;
 
     // keeps track of what rooms have been seen across all runs
@@ -20,6 +22,7 @@ export interface SaveFile {
 
 export function Default(items?: Partial<SaveFile>): SaveFile {
     return {
+        current_building: null,
         buildings: [],
         wallet: {},
         rooms_seen: [],

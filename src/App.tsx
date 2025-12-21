@@ -1,13 +1,14 @@
 import './App.css';
 import { useState } from 'react';
 import { Main } from './components/Main.tsx';
+import { DebugModeContext } from './context/DebugModeContext.ts';
 
 const App = () => {
-    const [rc, set_rc] = useState(false);
+    const [debug_mode, set_debug_mode] = useState(false);
 
     return (
-        <>
-            <Main allow_right_click={rc} />
+        <DebugModeContext value={debug_mode}>
+            <Main />
             <a className="build-number" href={BUILD_LINK} target={'_blank'}>
                 Build #{BUILD_NUM}
             </a>
@@ -16,12 +17,12 @@ const App = () => {
                     className="build-number"
                     style={{ right: 0, left: 'unset' }}
                     type={'button'}
-                    onClick={() => set_rc((x) => !x)}
+                    onClick={() => set_debug_mode((x) => !x)}
                 >
-                    Browser Context Menu {rc ? '✅' : '❌'}
+                    Debug Mode {debug_mode ? '✅' : '❌'}
                 </button>
             )}
-        </>
+        </DebugModeContext>
     );
 };
 

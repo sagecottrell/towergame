@@ -1,47 +1,49 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { useImmerReducer } from 'use-immer';
 import { TEST_SAVE } from '../content/test-save.ts';
+import { DebugModeContext } from '../context/DebugModeContext.ts';
 import { SaveFileContext } from '../context/SaveFileContext.ts';
 import type { SaveFileActions } from '../events/SaveFileActions.ts';
 import { useConstructionContext } from '../hooks/useConstructionContext.ts';
 import { useSelectedRoom } from '../hooks/useSelectedRoom.ts';
 import { SaveFileReducer } from '../reducers/SaveFileReducer.ts';
-import type { SaveFile } from '../types/SaveFile.ts';
-import { AllBuildings } from './AllBuildings.tsx';
 import type { BuildingId } from '../types/Building.ts';
 import type { uint } from '../types/RestrictedTypes.ts';
+import type { SaveFile } from '../types/SaveFile.ts';
+import { BuildingComponent } from './BuildingComponent.tsx';
+import { BuildingSelect } from './BuildingSelect.tsx';
 
-interface Props {
-    allow_right_click: boolean;
-}
-
-export function Main({ allow_right_click }: Props) {
+export function Main() {
+    const debug_mode = useContext(DebugModeContext);
     const [state, dispatch] = useImmerReducer<SaveFile, SaveFileActions>(SaveFileReducer, TEST_SAVE);
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: TODO: remove
     useEffect(() => {
-        // TODO: Remove this
+        // runs the code that sets up various items in the building
         dispatch({ action: 'increase-tier', building_id: 0 as BuildingId, tier: 0 as uint });
     }, []);
 
     const [, set_construction] = useConstructionContext.all();
     const [, set_selected_room] = useSelectedRoom.all();
+    const current_building = state.current_building !== null ? state.buildings[state.current_building] : null;
 
     const cancel_construction = useCallback(
         (ev: React.MouseEvent) => {
-            if (!allow_right_click) {
+            if (!debug_mode) {
                 ev.preventDefault();
                 set_construction(null);
                 set_selected_room(null);
             }
         },
-        [set_construction, set_selected_room, allow_right_click],
+        [set_construction, set_selected_room, debug_mode],
     );
 
     return (
         <SaveFileContext value={[state, dispatch]}>
             <main onContextMenu={cancel_construction}>
+                {!current_building && <BuildingSelect />}
                 <StaticBg onContextMenu={cancel_construction} />
-                <AllBuildings />
+                {current_building && <BuildingComponent key={current_building.id} building={current_building} />}
             </main>
         </SaveFileContext>
     );

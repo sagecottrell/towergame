@@ -13,6 +13,9 @@ import type { RoomId } from '../types/Room.ts';
 export type SaveFileActions = DiscriminatedUnion<
     'action',
     {
+        'load-building': {
+            building_id: BuildingId;
+        };
         'buy-perm-upgrade': {
             name: string;
         };
