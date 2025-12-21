@@ -65,14 +65,8 @@ export type SaveFileActions = DiscriminatedUnion<
             building_id: BuildingId;
             worker_kind: TowerWorkerKind;
             payload: WorkerStats['payload'];
-            from_position: int;
-            from_floor: int;
-            dest_floor: int;
-            dest_position: int;
-        };
-        'worker-move-start': {
-            building_id: BuildingId;
-            worker_id: TowerWorkerId;
+            start_room_id: RoomId;
+            end_room_id: RoomId;
         };
         'worker-move-end': {
             building_id: BuildingId;
