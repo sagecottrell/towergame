@@ -1,7 +1,7 @@
 import groupBy from 'lodash/groupBy';
 import isEmpty from 'lodash/isEmpty';
 import { useContext } from 'react';
-import { entries } from '../betterObjectFunctions.ts';
+import { entries, keys } from '../betterObjectFunctions.ts';
 import { BuildingContext } from '../context/BuildingContext.ts';
 import { useSelectedRoom } from '../hooks/useSelectedRoom.ts';
 import type { RoomId } from '../types/Room.ts';
@@ -21,20 +21,26 @@ export function RoomInfo() {
                 Selected room: {def.display_name} - ID {room.id}
             </span>
             <span>Floor: {room.bottom_floor}</span>
-            {!isEmpty(room.total_resources_produced) && (
+            {(!isEmpty(def.resource_requirements) || !isEmpty(def.production)) && (
                 <span>
-                    Resources Produced: <ResourceMapDisplay resources={room.total_resources_produced} />
-                </span>
-            )}
-            {!isEmpty(room.storage) && (
-                <span>
-                    Storage: <ResourceMapDisplay resources={room.storage} show_name show_zeroes />
+                    Storage:
+                    <ResourceMapDisplay
+                        resources={room.storage}
+                        show_name
+                        force={[...keys(def.resource_requirements), ...keys(def.production)]}
+                    />
                 </span>
             )}
             {!isEmpty(room.workers) && (
                 <span>
                     Workers:
                     <WorkerMapDisplay resources={room.workers} show_name show_zeroes />
+                </span>
+            )}
+            {!isEmpty(room.workers_delivering) && (
+                <span>
+                    Workers Dispatched:
+                    <WorkerMapDisplay resources={room.workers_delivering} show_name show_zeroes />
                 </span>
             )}
             {!isEmpty(def.workers_produced) && (
@@ -45,13 +51,19 @@ export function RoomInfo() {
                             const map = Object.fromEntries(items.map(([, kind, count]) => [kind, count] as const));
                             const room = building.rooms[room_id as unknown as RoomId];
                             return (
-                                <span key={room_id} style={{ display: 'flex', gap: '2px' }}>
-                                    Room {room_id} - <img src={ROOM_DEFS[room.kind].build_thumb} alt={'no'} /> -{' '}
+                                <span key={room_id} style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                                    <img src={ROOM_DEFS[room.kind].build_thumb} alt={'no'} />
+                                    Room {room_id}:
                                     <WorkerMapDisplay resources={map} show_name />
                                 </span>
                             );
                         },
                     )}
+                </span>
+            )}
+            {!isEmpty(room.total_resources_produced) && (
+                <span>
+                    Resources Produced: <ResourceMapDisplay resources={room.total_resources_produced} />
                 </span>
             )}
         </div>

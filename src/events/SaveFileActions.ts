@@ -3,7 +3,7 @@ import type { ExtendsOmit } from '../types/extendsOmit.ts';
 import type { FloorKind } from '../types/FloorDefinition.ts';
 import type { int, uint } from '../types/RestrictedTypes.ts';
 import type { RoomKind } from '../types/RoomDefinition.ts';
-import type { Transportation } from '../types/Transportation.ts';
+import type {Transportation, TransportationId} from '../types/Transportation.ts';
 import type { TowerWorkerId, WorkerStats } from '../types/TowerWorker.ts';
 import type { BuildingId } from '../types/Building.ts';
 import type { FloorId } from '../types/Floor.ts';
@@ -71,6 +71,11 @@ export type SaveFileActions = DiscriminatedUnion<
         'worker-move-end': {
             building_id: BuildingId;
             worker_id: TowerWorkerId;
+        };
+        'worker-add-transport': {
+            building_id: BuildingId;
+            worker_id: TowerWorkerId;
+            transport_id: TransportationId;
         };
         'room-tick': {
             // not intended to always be run for every room. just when something needs to happen

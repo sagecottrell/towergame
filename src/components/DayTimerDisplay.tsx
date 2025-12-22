@@ -1,9 +1,11 @@
 import { useContext } from 'react';
 import { BuildingContext } from '../context/BuildingContext.ts';
+import { usePausedStore } from '../context/PausedContext.ts';
 
 const NOON = 12 * 60 * 1000;
 export function DayTimerDisplay() {
     const [building, update] = useContext(BuildingContext);
+    const { pause, paused, unpause } = usePausedStore();
     const day_number = Math.floor(building.time_ms / building.time_per_day_ms) + 1;
     const sday_start = NOON - Math.floor((building.time_per_day_ms * 2) / 3);
     const day_start = Math.round(sday_start / 60_000) * 60_000;
@@ -35,6 +37,9 @@ export function DayTimerDisplay() {
                             <progress max={building.time_per_day_ms} value={time} />
                             <Time time={day_start + building.time_per_day_ms} style={{ fontSize: 'small' }} />
                         </span>
+                        <button type={'button'} onClick={paused ? unpause : pause}>
+                            {paused ? 'Un' : ''}Pause
+                        </button>
                     </>
                 )}
                 {!building.day_started && (

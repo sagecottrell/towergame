@@ -34,22 +34,28 @@ export function mapping_subtract<O extends { [p: string]: number }>(a: O, b: O, 
     return source_copy;
 }
 
-export function mapping_add<O extends { [p: string]: number }>(a: O, b: O): O {
+export function mapping_add<O extends { [p: string]: number }, K extends O>(
+    a: O,
+    b: K,
+    keep_zeroes: boolean = true,
+): O {
     const sum: O = { ...a };
     for (const key in b) {
         const av = a[key];
         const bv = b[key];
         if (av !== undefined) sum[key] = (av + bv) as O[Extract<keyof O, string>];
         else sum[key] = bv;
+        if (sum[key] === 0 && !keep_zeroes) delete sum[key];
     }
     return sum;
 }
 
-export function mapping_mul<O extends { [p: string]: number }>(a: O, n: number): O {
+export function mapping_mul<O extends { [p: string]: number }>(a: O, n: number, keep_zeroes: boolean = true): O {
     const sum: O = { ...a };
     for (const resource in a) {
         const av = a[resource];
         if (av !== undefined) sum[resource] = (av * n) as O[Extract<keyof O, string>];
+        if (sum[resource] === 0 && !keep_zeroes) delete sum[resource];
     }
     return sum;
 }

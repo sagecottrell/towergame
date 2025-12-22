@@ -50,12 +50,23 @@ export const ROOM_DEFS_RAW = {
         display_name: 'Fire Room',
         sprite_empty: images.rooms.FIRE_ROOM1_GIF,
         sprite_active: images.rooms.FIRE_ROOM1_GIF,
-        cost_to_build: {coin: 150},
+        cost_to_build: { coin: 150 },
         build_thumb: images.rooms.FIRE_ROOM1_PNG,
-        workers_required: {faceless: 1},
-        production: {fire: 1},
+        workers_required: { faceless: 1 },
+        production: { fire: 1 },
         readme: 'Produces some FIRE',
-    }
+    },
+    'laser-room': {
+        min_width: 4,
+        display_name: 'Laser Room',
+        sprite_empty: images.rooms.LASER_ROOM_GIF,
+        sprite_active: images.rooms.LASER_ROOM_GIF,
+        cost_to_build: { fire: 500 },
+        build_thumb: images.rooms.LASER_ROOM_GIF,
+        resource_requirements: { fire: 2 },
+        production: { laser: 1 },
+        readme: 'automate laser beams in order to make more laser beams',
+    },
 } as const satisfies SMap<RoomDefRaw>;
 
 export interface RoomDefRaw {

@@ -26,6 +26,9 @@ export const RESOURCE_DEFS_RAW = {
     earth: {
         sprite: images.resources.EARTH_PNG,
     },
+    laser: {
+        sprite: images.resources.LASER_PNG,
+    },
 } satisfies SMap<ResourceDefRaw>;
 
 export interface ResourceDefRaw {

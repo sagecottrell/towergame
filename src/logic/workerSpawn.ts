@@ -22,10 +22,13 @@ export function worker_spawn(
     building.workers[worker_id] = {
         id: worker_id,
         kind: worker_kind,
+        source_room_id: start_room_id,
         position: [start_room.bottom_floor, start_room.position],
         destination: [end_room.bottom_floor, end_room.position],
+        destination_room_id: end_room_id,
         next_step: [fnext, pnext],
         stats: {
+            confusion: 0,
             capacity: def.base_capacity,
             payload,
             speed: def.movement_speed,

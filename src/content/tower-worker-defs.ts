@@ -6,7 +6,7 @@ export const TOWER_WORKER_DEFS_RAW = {
         sprite_moving: images.workers.FACELESS_WALK_GIF,
         planning_capability: 2,
         base_capacity: 1,
-        movement_speed: 1,
+        movement_speed: 2,
     },
 } satisfies SMap<TowerWorkerDefsRaw>;
 

@@ -7,7 +7,6 @@ html {
 
 * {
     font-size: inherit;
-    animation-play-state: inherit;
     user-select: none;
 }
 
@@ -45,7 +44,6 @@ main {
 Utils
 
  */
-
 
 img.resource-img {
     width: 1.5em;

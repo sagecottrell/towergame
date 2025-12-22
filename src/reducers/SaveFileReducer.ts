@@ -23,6 +23,9 @@ import { apply_workers } from '../logic/applyWorkers.ts';
 import { entries, keys } from '../betterObjectFunctions.ts';
 import { rng_action } from '../logic/rng_action.ts';
 import { filter_sort_target_rooms } from '../logic/filter_sort_target_rooms.ts';
+import {ROOM_TICK_AFTER_DELIVER_MS, WORKER_SPAWN_DELAY_MS} from "../constants.ts";
+import {worker_deposit_resources} from "../logic/worker_deposit_resources.ts";
+import {worker_return_to_source} from "../logic/worker_return_to_source.ts";
 
 type ActionMap = {
     [p in SaveFileActions['action']]: (
@@ -219,16 +222,57 @@ const ActionMaps: ActionMap = {
             action: 'worker-move-end',
             building_id,
             worker_id,
-            delay_ms: (Math.abs(start_room_id - pnext) * 1000) / def.movement_speed,
+            delay_ms: (Math.abs(start_room.position - pnext) * 1000) / def.movement_speed + WORKER_SPAWN_DELAY_MS * 2,
         });
     },
     // ================================================================================================================
     // ================================================================================================================
-    'worker-move-end'() {
+    'worker-move-end'(save, {worker_id, building_id}, dispatch) {
+        const building = save.buildings[building_id];
+        const worker = building.workers[worker_id];
+        if (!worker.stats) {
+            return worker_return_to_source(building, worker);
+        }
+
+        worker.position = worker.next_step ?? worker.position;
+
         // do these in order until one succeeds:
         // 1. check if reached destination; deposit resources; despawn worker and add back to room
         // 2. check if reached transportation; remove from building and add worker to transport
         // 3. despawn or attempt pathfinding to destination again
+        const [p, f] = worker.position;
+        const [dp, df] = worker.destination;
+        if (p === dp && f === df) {
+            // deposit resources
+            if (worker.stats.payload && worker.destination_room_id !== null) {
+                worker_deposit_resources(worker, building.rooms[worker.destination_room_id]);
+                dispatch({action: 'room-tick', building_id, room_id: worker.destination_room_id, delay_ms: ROOM_TICK_AFTER_DELIVER_MS});
+            }
+            worker_return_to_source(building, worker);
+            return;
+        }
+        if (df !== f) {
+            for (const transport of Object.values(building.transports)) {
+                if (f >= transport.bottom_floor && f < transport.height && p >= transport.position && p < transport.position + transport.width) {
+                    return dispatch({action: 'worker-add-transport', building_id, worker_id, transport_id: transport.id});
+                }
+            }
+        }
+        // attempt pathfinding again until too confused
+        if (worker.stats.confusion > 100) {
+            if (worker.source_room_id)
+                worker_deposit_resources(worker, building.rooms[worker.source_room_id]);
+            worker_return_to_source(building, worker);
+            return;
+        }
+        worker.stats.confusion += 10;
+    },
+    "worker-add-transport"(save, action) {
+        const {building_id, worker_id, transport_id} = action;
+        const building = save.buildings[building_id];
+        const worker = building.workers[worker_id];
+        const transport = building.transports[transport_id];
+        transport.occupancy.push(worker);
     },
     // ================================================================================================================
     // ================================================================================================================
@@ -280,6 +324,8 @@ const ActionMaps: ActionMap = {
                             output_room.state.needs[resource_id],
                             room.storage[resource_id],
                         ) as uint;
+                        if (amount <= 0)
+                            continue;
                         output_room.state.needs[resource_id] = (output_room.state.needs[resource_id] - amount) as uint;
                         room.storage[resource_id] = (room.storage[resource_id] - amount) as uint;
                         dispatch({
@@ -300,6 +346,7 @@ const ActionMaps: ActionMap = {
 };
 
 export function SaveFileReducer(save_file: SaveFile, { delay_ms, ...action }: SaveFileActions) {
+    // console.debug(action, delay_ms);
     if (delay_ms && 'building_id' in action) {
         insert_future_action(save_file, action.building_id, action, delay_ms);
     } else {

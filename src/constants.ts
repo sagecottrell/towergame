@@ -10,3 +10,6 @@ export const Z_INDEX = {
 
     builder_overlay: 20000,
 };
+
+export const WORKER_SPAWN_DELAY_MS = 250;
+export const ROOM_TICK_AFTER_DELIVER_MS = 500;

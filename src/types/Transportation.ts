@@ -11,7 +11,8 @@ export interface Transportation {
     position: int;
     bottom_floor: int;
     height: uint;
-    occupancy: ReadonlyArray<TowerWorker>;
+    occupancy: TowerWorker[];
+    width: uint;
 }
 
 export function Default(items?: Partial<Transportation>): Transportation {
@@ -22,6 +23,7 @@ export function Default(items?: Partial<Transportation>): Transportation {
         position: 0 as int,
         bottom_floor: 0 as int,
         height: 0 as uint,
+        width: 0 as uint,
         occupancy: [],
         ...items,
     };

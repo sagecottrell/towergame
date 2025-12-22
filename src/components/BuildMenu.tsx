@@ -45,7 +45,7 @@ export function BuildMenu() {
     /// ====================================================================================================
     const [current_menu, set_current_menu] = useState<Menu>(Menu.Rooms);
 
-    const {pinned, position, elem: pin_elem} = usePinSide(true, null);
+    const { pinned, position, elem: pin_elem } = usePinSide(true, null);
     const [mouse_in, set_mouse_in] = useState(false);
     const [rect, set_rect] = useState<DOMRect | null>(null);
     const ref = useRef<HTMLDivElement>(null);

@@ -15,7 +15,7 @@ export type RoomState = DiscriminatedUnion<
             // are accounted for, but may not be delivered yet.
             needs: ResourceMap<uint>;
             // used to determine priority for delivery
-            waiting_since: uint;
+            waiting_since: number;
         };
     }
 >;
@@ -32,11 +32,13 @@ export interface Room {
     total_resources_produced: ResourceMap<uint>;
     // workers employed in this room
     workers: { [p: TowerWorkerKind]: uint };
+    workers_delivering: {[p: TowerWorkerKind]: uint};
     // resources stored in this room
     storage: ResourceMap<uint>;
 
     // precalculated list of rooms to send outputs or workers to
     output_priorities: { [p: RoomId]: 'prioritize' | 'never' };
+    output_strategy: 'closest-first' | 'longest-wait-first' | 'farthest-first';
     // which rooms have which kinds of workers in what quantity
     produced_workers_committed: [RoomId, TowerWorkerKind, uint][];
     time_produced_today: uint;
@@ -53,10 +55,12 @@ export function Default(items?: Partial<Room>): Room {
         height: 0 as uint,
         bottom_floor: 0 as int,
         workers: {},
+        workers_delivering: {},
         storage: {},
         output_priorities: {},
         produced_workers_committed: [],
         time_produced_today: 0 as uint,
+        output_strategy: 'longest-wait-first',
         ...items,
     };
 }

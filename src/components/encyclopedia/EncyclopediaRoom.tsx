@@ -1,8 +1,8 @@
 import isEmpty from 'lodash/isEmpty';
-import { ROOM_DEFS, type RoomDefinition, type RoomKind } from '../../types/RoomDefinition.ts';
-import { ResourceMapDisplay } from '../ResourceMapDisplay.tsx';
 import { useLayoutEffect, useState } from 'react';
 import { as_uint_or_default } from '../../types/RestrictedTypes.ts';
+import { ROOM_DEFS, type RoomDefinition, type RoomKind } from '../../types/RoomDefinition.ts';
+import { ResourceMapDisplay } from '../ResourceMapDisplay.tsx';
 
 interface Props {
     room_kind: RoomKind;
@@ -17,11 +17,17 @@ export function EncyclopediaRoom({ room_kind }: Props) {
         display_name: <span style={{ fontSize: 'larger' }}>{def.display_name}</span>,
         readme: def.readme,
         cost_to_build: !isEmpty(def.cost_to_build(def.min_width, def.min_height)) && <CostCalculator def={def} />,
+        resource_requirements: !isEmpty(def.resource_requirements) && (
+            <div>
+                Production Inputs:
+                <ResourceMapDisplay resources={def.resource_requirements} />
+            </div>
+        ),
         production: !isEmpty(def.production) && (
             <div>
                 {def.max_productions_per_day
-                    ? `Produce up to ${def.max_productions_per_day} time${def.max_productions_per_day > 1 ? 's' : ''} per day`
-                    : 'Produce'}
+                    ? `Produce Output up to ${def.max_productions_per_day} time${def.max_productions_per_day > 1 ? 's' : ''} per day`
+                    : 'Production Outputs'}
                 :
                 <ResourceMapDisplay resources={def.production} show_name />
             </div>
@@ -30,18 +36,40 @@ export function EncyclopediaRoom({ room_kind }: Props) {
         produce_to_wallet: null,
         workers_produced: null,
         workers_required: null,
-        resource_requirements: null,
         upgrades: null,
         min_height: null,
         min_width: null,
         width_multiples_of: null,
-        sprite_active: def.sprite_active && def.sprite_empty !== def.sprite_active && <>Active: <br/><img src={def.sprite_active} alt={'active'} /> </>,
-        sprite_empty: def.sprite_empty && <>Default Sprite:<br/><img src={def.sprite_empty} alt={'empty'} /> </>,
+        sprite_active: def.sprite_active && def.sprite_empty !== def.sprite_active && (
+            <>
+                Active: <br />
+                <img src={def.sprite_active} alt={'active'} />
+            </>
+        ),
+        sprite_empty: def.sprite_empty && (
+            <>
+                Default Sprite:
+                <br />
+                <img src={def.sprite_empty} alt={'empty'} />
+            </>
+        ),
         max_width: null,
         overlay: null,
         build_thumb: null,
-        sprite_empty_night: def.sprite_empty_night && <>Night Empty:<br/><img src={def.sprite_empty_night} alt={'empty-night'} /> </>,
-        sprite_active_night: def.sprite_active_night && <>Night Active:<br/><img src={def.sprite_active_night} alt={'active-night'} /> </>,
+        sprite_empty_night: def.sprite_empty_night && (
+            <>
+                Night Empty:
+                <br />
+                <img src={def.sprite_empty_night} alt={'empty-night'} />
+            </>
+        ),
+        sprite_active_night: def.sprite_active_night && (
+            <>
+                Night Active:
+                <br />
+                <img src={def.sprite_active_night} alt={'active-night'} />
+            </>
+        ),
         max_height: null,
         category: null,
         d: null,

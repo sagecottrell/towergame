@@ -1,8 +1,8 @@
 import type { Building } from './Building.ts';
+import type { FloorKind } from './FloorDefinition.ts';
 import type { ResourceMap } from './ResourceDefinition.ts';
 import type { uint } from './RestrictedTypes.ts';
 import type { RoomKind } from './RoomDefinition.ts';
-import type { FloorKind } from './FloorDefinition.ts';
 
 /**
  * Represents the overall player's status across all play time.

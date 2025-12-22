@@ -1,7 +1,8 @@
-import { useCallback, useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useLayoutEffect, useRef } from 'react';
 import { useImmerReducer } from 'use-immer';
 import { TEST_SAVE } from '../content/test-save.ts';
 import { DebugModeContext } from '../context/DebugModeContext.ts';
+import { usePausedStore } from '../context/PausedContext.ts';
 import { SaveFileContext } from '../context/SaveFileContext.ts';
 import type { SaveFileActions } from '../events/SaveFileActions.ts';
 import { useConstructionContext } from '../hooks/useConstructionContext.ts';
@@ -16,6 +17,8 @@ import { BuildingSelect } from './BuildingSelect.tsx';
 export function Main() {
     const debug_mode = useContext(DebugModeContext);
     const [state, dispatch] = useImmerReducer<SaveFile, SaveFileActions>(SaveFileReducer, TEST_SAVE);
+    const { paused } = usePausedStore();
+    const ref = useRef<HTMLElement>(null);
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: TODO: remove
     useEffect(() => {
@@ -26,6 +29,18 @@ export function Main() {
     const [, set_construction] = useConstructionContext.all();
     const [, set_selected_room] = useSelectedRoom.all();
     const current_building = state.current_building !== null ? state.buildings[state.current_building] : null;
+
+    useLayoutEffect(() => {
+        if (paused) {
+            ref.current?.getAnimations({ subtree: true }).forEach((x) => {
+                x.pause();
+            });
+        } else {
+            ref.current?.getAnimations({ subtree: true }).forEach((x) => {
+                x.play();
+            });
+        }
+    }, [paused]);
 
     const cancel_construction = useCallback(
         (ev: React.MouseEvent) => {
@@ -40,7 +55,13 @@ export function Main() {
 
     return (
         <SaveFileContext value={[state, dispatch]}>
-            <main onContextMenu={cancel_construction}>
+            <main
+                ref={ref}
+                onContextMenu={cancel_construction}
+                style={{
+                    animationPlayState: paused ? 'paused' : 'running',
+                }}
+            >
                 {!current_building && <BuildingSelect />}
                 <StaticBg onContextMenu={cancel_construction} />
                 {current_building && <BuildingComponent key={current_building.id} building={current_building} />}

@@ -1,3 +1,17 @@
-import { createContext } from 'react';
+import { create } from 'zustand/react';
 
-export const PausedContext = createContext(false);
+interface State {
+    paused: boolean;
+    pause(): void;
+    unpause(): void;
+}
+
+export const usePausedStore = create<State>((set) => ({
+    paused: false,
+    pause() {
+        set({ paused: true });
+    },
+    unpause() {
+        set({ paused: false });
+    },
+}));
