@@ -32,7 +32,7 @@ export interface Room {
     total_resources_produced: ResourceMap<uint>;
     // workers employed in this room
     workers: { [p: TowerWorkerKind]: uint };
-    workers_delivering: {[p: TowerWorkerKind]: uint};
+    workers_delivering: { [p: TowerWorkerKind]: uint };
     // resources stored in this room
     storage: ResourceMap<uint>;
 
@@ -42,6 +42,7 @@ export interface Room {
     // which rooms have which kinds of workers in what quantity
     produced_workers_committed: [RoomId, TowerWorkerKind, uint][];
     time_produced_today: uint;
+    incoming_pending_deliveries: ResourceMap<uint>;
 }
 
 export function Default(items?: Partial<Room>): Room {
@@ -61,6 +62,7 @@ export function Default(items?: Partial<Room>): Room {
         produced_workers_committed: [],
         time_produced_today: 0 as uint,
         output_strategy: 'longest-wait-first',
+        incoming_pending_deliveries: {},
         ...items,
     };
 }

@@ -61,6 +61,12 @@ export function RoomInfo() {
                     )}
                 </span>
             )}
+            {!isEmpty(room.incoming_pending_deliveries) && (
+                <span style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    Incoming Deliveries:
+                    <ResourceMapDisplay resources={room.incoming_pending_deliveries} show_name />
+                </span>
+            )}
             {!isEmpty(room.total_resources_produced) && (
                 <span>
                     Resources Produced: <ResourceMapDisplay resources={room.total_resources_produced} />

@@ -1,4 +1,4 @@
-import type { ResourceKind } from './ResourceDefinition.ts';
+import type {ResourceMap} from './ResourceDefinition.ts';
 import type { int, uint } from './RestrictedTypes.ts';
 import type { RoomId } from './Room.ts';
 import type { TowerWorkerKind } from './TowerWorkerDefinition.ts';
@@ -19,7 +19,7 @@ export interface TowerWorker {
 
 export interface WorkerStats {
     capacity: uint;
-    payload: [ResourceKind, uint] | null;
+    payload: ResourceMap<uint>;
     speed: number;
     status: 'working' | 'confused' | 'angry';
     // failure to pathfind to the destination accrues confusion.

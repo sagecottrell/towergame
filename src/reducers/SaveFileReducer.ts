@@ -23,7 +23,7 @@ import { apply_workers } from '../logic/applyWorkers.ts';
 import { entries, keys } from '../betterObjectFunctions.ts';
 import { rng_action } from '../logic/rng_action.ts';
 import { filter_sort_target_rooms } from '../logic/filter_sort_target_rooms.ts';
-import {ROOM_TICK_AFTER_DELIVER_MS, WORKER_SPAWN_DELAY_MS} from "../constants.ts";
+import {INPUT_BUFFER_MULTIPLIER, ROOM_TICK_AFTER_DELIVER_MS, WORKER_SPAWN_DELAY_MS} from "../constants.ts";
 import {worker_deposit_resources} from "../logic/worker_deposit_resources.ts";
 import {worker_return_to_source} from "../logic/worker_return_to_source.ts";
 
@@ -207,7 +207,8 @@ const ActionMaps: ActionMap = {
     // ================================================================================================================
     'worker-spawn'(updated, action, dispatch) {
         // spawns a worker from their home room in order to take resources to another room.
-        const { building_id, start_room_id, worker_kind } = action;
+        const { building_id, start_room_id, worker_kind, end_room_id, payload } = action;
+
         const building = updated.buildings[building_id];
         const start_room = building.rooms[start_room_id];
 
@@ -218,6 +219,8 @@ const ActionMaps: ActionMap = {
         const def = TOWER_WORKER_DEFS[worker_kind];
         const { worker_id, pnext } = worker_spawn(building, action);
         start_room.workers_delivering = mapping_add(start_room.workers_delivering, {[worker_kind]: 1} as Room['workers_delivering']);
+        const end_room = building.rooms[end_room_id];
+        end_room.incoming_pending_deliveries = mapping_add(end_room.incoming_pending_deliveries, payload);
         dispatch({
             action: 'worker-move-end',
             building_id,
@@ -245,7 +248,9 @@ const ActionMaps: ActionMap = {
         if (p === dp && f === df) {
             // deposit resources
             if (worker.stats.payload && worker.destination_room_id !== null) {
-                worker_deposit_resources(worker, building.rooms[worker.destination_room_id]);
+                const dest_room = building.rooms[worker.destination_room_id];
+                worker_deposit_resources(worker, dest_room);
+                dest_room.incoming_pending_deliveries = mapping_subtract(dest_room.incoming_pending_deliveries, worker.stats.payload, false);
                 dispatch({action: 'room-tick', building_id, room_id: worker.destination_room_id, delay_ms: ROOM_TICK_AFTER_DELIVER_MS});
             }
             worker_return_to_source(building, worker);
@@ -318,23 +323,26 @@ const ActionMaps: ActionMap = {
             );
 
             for (const output_room of [...priority_targets, ...non_priority_targets]) {
+                const output_def = ROOM_DEFS[output_room.kind];
                 for (const resource_id of keys(output_room.state.needs)) {
                     if (room.storage[resource_id]) {
                         const amount = Math.min(
-                            output_room.state.needs[resource_id],
+                            // what the room needs, plus a buffer
+                            output_room.state.needs[resource_id] + (output_def.resource_requirements[resource_id] * INPUT_BUFFER_MULTIPLIER - (output_room.storage[resource_id] ?? 0)) - (output_room.incoming_pending_deliveries[resource_id] ?? 0),
                             room.storage[resource_id],
                         ) as uint;
                         if (amount <= 0)
                             continue;
                         output_room.state.needs[resource_id] = (output_room.state.needs[resource_id] - amount) as uint;
                         room.storage[resource_id] = (room.storage[resource_id] - amount) as uint;
+                        const available_workers = mapping_subtract(room.workers, room.workers_delivering, false);
                         dispatch({
                             action: 'worker-spawn',
                             building_id,
                             end_room_id: output_room.id,
                             start_room_id: room.id,
-                            payload: [resource_id, amount],
-                            worker_kind: keys(def.workers_required)[0],
+                            payload: {[resource_id]: amount},
+                            worker_kind: keys(available_workers)[0],
                         });
                     }
                 }

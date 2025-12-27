@@ -13,3 +13,4 @@ export const Z_INDEX = {
 
 export const WORKER_SPAWN_DELAY_MS = 250;
 export const ROOM_TICK_AFTER_DELIVER_MS = 500;
+export const INPUT_BUFFER_MULTIPLIER = 2;
